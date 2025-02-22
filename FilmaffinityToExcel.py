@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
+#The url is the main page of the profile you want to scrape
 url = "https://www.filmaffinity.com/us/userratings.php?user_id=9855289&orderby=0&p=1&chv=list"
 h = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}
 
@@ -10,9 +11,12 @@ res = requests.get(url, headers = h, timeout = 10)
 soup = BeautifulSoup(res.text, "html.parser")
 
 page_number = int(soup.find_all("li", class_ = "page-item")[-2].text.strip())
+
+#Function to change the url page number
 def update_url(old_url, new_page_number):
 	return re.sub(r'(p=)\d+', rf'\g<1>{new_page_number}', old_url)
 
+#Function to get the data from the profile.
 def get_films_data():
 	film_list = []
 	ratings_list = []
@@ -32,7 +36,8 @@ def get_films_data():
 			ratings_list.append(ratings_in_page[j].text.strip())
 			date_list.append(date_in_page[j].text.strip())
 			country_list.append(images_in_card_in_page[j].find("img", class_ = "nflag").attrs["alt"])
-
+		
+		#All the imformation is stored in a dictionary
 		dataset1 = {
 			"Film" : film_list,
 			"Rating" : ratings_list,
@@ -40,6 +45,7 @@ def get_films_data():
 			"Country" : country_list
 		}
 	return dataset1
+
 
 dataset1 = get_films_data()
 
