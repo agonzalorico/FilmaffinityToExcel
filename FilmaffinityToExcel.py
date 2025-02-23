@@ -4,8 +4,21 @@ import pandas as pd
 import re
 
 #The url is the main page of the profile you want to scrape
-url = "https://www.filmaffinity.com/us/userratings.php?user_id=9855289&orderby=0&p=1&chv=list"
+
+user_id = "9008848"
+base_url = "https://www.filmaffinity.com/us/userratings.php?user_id=0000000&orderby=0&p=1&chv=list"
 h = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"}
+
+#Function to add the chosen user_id to the generic url
+
+def update_user_id(base_url, new_user_id):
+ 
+    updated_url = re.sub(r"(user_id=)\d{7}", rf"\g<1>{new_user_id}", base_url)
+    return updated_url
+
+url = update_user_id(base_url, user_id)
+
+#The request is made, and the total page number is obtained
 
 res = requests.get(url, headers = h, timeout = 10)
 soup = BeautifulSoup(res.text, "html.parser")
@@ -50,6 +63,8 @@ def get_films_data():
 dataset1 = get_films_data()
 
 df1 = pd.DataFrame(dataset1)
+
+#The dataset is exported to an Excel
 df1.to_excel("Films_Test.xlsx", sheet_name= "Films")
 
 
